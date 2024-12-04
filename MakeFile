@@ -1,0 +1,20 @@
+# Compiler and flags
+CXX = clang++
+CXXFLAGS = -std=gnu++14 -g
+
+# Source files and build targets
+SRCS = $(wildcard src/*.cpp)      # Finds all .cpp files in the current directory
+OBJS = $(SRCS:.cpp=.o)        # Replaces .cpp with .o for object files
+TARGET = main                 # Name of the output executable
+
+# Default rule to build the target
+$(TARGET): $(OBJS)
+	$(CXX) $(CXXFLAGS) $(OBJS) -o $(TARGET)
+
+# Rule to compile .cpp files into .o files
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+# Clean up generated files
+clean:
+	rm -f $(OBJS) $(TARGET)
