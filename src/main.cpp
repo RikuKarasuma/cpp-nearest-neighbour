@@ -11,9 +11,11 @@ Point findNearest(const Point& location,
     Point currentShortest; 
     for (const Point& otherLocation: allLocations) {
 
-        Point alreadyVisted = *std::find(visited.begin(), visited.end(), otherLocation);
+        std::vector<Point>::const_iterator alreadyVisted = std::find(visited.begin(), visited.end(), otherLocation);
 
-        if (alreadyVisted == otherLocation) {
+        // Need to check for finding failure before dereferencing
+        // or else we will encounter issues on linux.
+        if (alreadyVisted != visited.end() || *alreadyVisted == otherLocation) {
             continue;
         }
         

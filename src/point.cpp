@@ -28,5 +28,5 @@ float Point::findDistance(const Point& toCompare) const {
 }
 
 void Point::toString() const {
-    std::cout << this->getName() + " at points x:" << this->getX() << " y:" << this->getY() << std::endl;
+    std::cout << this->getName() << " at points x:" << this->getX() << " y:" << this->getY() << std::endl;
 }
