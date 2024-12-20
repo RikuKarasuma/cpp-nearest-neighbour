@@ -1,17 +1,37 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <exception>
 #include "point.h"
 
-Point findNearest(const Point& location,
-                  const std::vector<Point>& allLocations,
-                  const std::vector<Point>& visited) {
+
+class StartingIndexError : public std::exception {
+    public:
+        const char* what() const noexcept override {
+            return "Can't start from an index less than zero.";
+        }
+};
+
+class IndexBoundaryError : public std::exception {
+    public:
+        const char* what() const noexcept override {
+            return "Can't start from an index greater than the total points provided.";
+        }
+};
+
+static Point findNearest(const Point& location,
+                         const std::vector<Point>& allLocations,
+                         const std::vector<Point>& visited) {
 
     float currentDistance(0);
     Point currentShortest; 
     for (const Point& otherLocation: allLocations) {
 
-        std::vector<Point>::const_iterator alreadyVisted = std::find(visited.begin(), visited.end(), otherLocation);
+        std::vector<Point>::const_iterator alreadyVisted = std::find(
+            visited.begin(),
+            visited.end(),
+            otherLocation
+        );
 
         // Need to check for finding failure before dereferencing
         // or else we will encounter issues on linux.
@@ -30,16 +50,13 @@ Point findNearest(const Point& location,
     return currentShortest;
 }
 
+static std::vector<Point> findShortestPathNearestNeighbour(const int startingPointIndex,
+                                                           const std::vector<Point>& points) {
 
-
-std::vector<Point> findShortestPathNearestNeighbour(const int startingPointIndex, const std::vector<Point>& points) {
-
-    if (startingPointIndex < 0) {
-        std::cerr << "Can't start from an index less than zero." << std::endl;
-    }
-    else if (startingPointIndex > (points.size() - 1)) {
-        std::cerr << "Can't start from an index greater than the total points provided." << std::endl;
-    }
+    if (startingPointIndex < 0)
+        throw StartingIndexError();
+    else if (startingPointIndex > (points.size() - 1))
+        throw IndexBoundaryError();
 
     std::vector<Point> shortestPathByIndex;
     Point currentPoint = points.at(startingPointIndex);
@@ -53,9 +70,7 @@ std::vector<Point> findShortestPathNearestNeighbour(const int startingPointIndex
     return shortestPathByIndex;
 }
 
-
-
-int main() {
+static void executeNearestNeighbour() {
 
     std::cout << std::endl;
     std::cout << "Initializing points..." << std::endl;
@@ -77,12 +92,24 @@ int main() {
 
     std::cout << "Calculating shortest path..." << std::endl << std::endl;
 
-    std::vector<Point> shortestPath = findShortestPathNearestNeighbour(4, points);
+    std::vector<Point> shortestPath = findShortestPathNearestNeighbour(0, points);
 
     std::cout << "Completed, listing path..." << std::endl << std::endl;
 
     for (Point route : shortestPath) {
         route.toString();
+    }
+}
+
+
+
+int main() {
+
+    try {
+        executeNearestNeighbour();
+    } catch (const std::exception& e) {
+        std::cerr << "ERROR: " << e.what() << std::endl;
+        return 1;
     }
 
     return 0;
